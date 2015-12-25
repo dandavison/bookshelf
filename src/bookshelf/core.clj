@@ -6,8 +6,14 @@
   (:use [compojure.core :refer :all])
   (:use [compojure.route :as route]))
 
+(defn write-to-file []
+  (with-open [w (clojure.java.io/writer "/tmp/out" :append true)]
+    (.write w "hello\n"))
+  "wrote to file")
+
 (defroutes handler
   (GET "/" [] "Hello World")
+  (GET "/write" [] (write-to-file))
   (route/not-found "Invalid request"))
 
 (def app
