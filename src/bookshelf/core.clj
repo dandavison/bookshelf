@@ -1,8 +1,8 @@
 (ns bookshelf.core
   (:gen-class)
-  (:use ring.adapter.jetty)
-  (:use ring.middleware.reload)
-  (:use ring.middleware.stacktrace))
+  (:use [ring.adapter.jetty :as jetty])
+  (:use [ring.middleware.reload :as reload])
+  (:use [ring.middleware.stacktrace :as stacktrace]))
 
 (defn handler [request]
   {:status 200
@@ -11,8 +11,8 @@
 
 (def app
   (-> #'handler
-      (wrap-reload '(bookshelf.core))
-      (wrap-stacktrace)))
+      (reload/wrap-reload '(bookshelf.core))
+      (stacktrace/wrap-stacktrace)))
 
 (defn run []
-  (run-jetty #'app {:port 3000}))
+  (jetty/run-jetty #'app {:port 3000}))
