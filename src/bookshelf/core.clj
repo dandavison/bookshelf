@@ -33,15 +33,17 @@
    (sql/drop-table-ddl :books)
    (sql/create-table-ddl :books
                          [:name :text]
-                         [:path :text]
-                         [:hash :text])))
+                         [:hash :text]
+                         [:size :float]
+                         [:path :text])))
 
 (defn populate-db []
   (for [file (library-files)]
     (sql/insert! db :books
                  {:name "name"
-                  :path (.getPath file)
-                  :hash (md5/md5-file file)})))
+                  :hash (md5/md5-file file)
+                  :size (.length file)
+                  :path (.getPath file)})))
 
 (defn library-files-html []
   (hiccup/html5
@@ -52,12 +54,14 @@
     [:thead
      [:tr
       [:td "Name"]
+      [:td "Size"]
       [:td "Hash"]
       [:td "Path"]]]
     [:tbody
      (for [row (sql/query db "SELECT * FROM books")]
        [:tr
         [:td (:name row)]
+        [:td (:size row)]
         [:td (:hash row)]
         [:td (:path row)]])]]))
 
