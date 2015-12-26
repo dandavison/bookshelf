@@ -47,24 +47,28 @@
                   :path (.getPath file)})))
 
 (defn library-files-html []
-  (hiccup/html5
-   [:head
-    [:title "bookshelf"]
-    (hiccup/include-css "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")]
-   [:table.table.table-hover.table-bordered
-    [:thead
-     [:tr
-      [:td "Name"]
-      [:td "Size"]
-      [:td "Hash"]
-      [:td "Path"]]]
-    [:tbody
-     (for [row (sql/query db "SELECT * FROM books")]
+  (let [rows (sql/query db "SELECT * FROM books")
+        counts (frequencies (map :hash rows))]
+    (hiccup/html5
+     [:head
+      [:title "bookshelf"]
+      (hiccup/include-css "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")]
+     [:table.table.table-hover.table-bordered
+      [:thead
        [:tr
-        [:td (:name row)]
-        [:td (humanize/filesize (:size row))]
-        [:td (:hash row)]
-        [:td (:path row)]])]]))
+        [:td "Name"]
+        [:td "Size"]
+        [:td "Hash"]
+        [:td "Notes"]
+        [:td "Path"]]]
+      [:tbody
+       (for [row rows]
+         [:tr
+          [:td (:name row)]
+          [:td (humanize/filesize (:size row))]
+          [:td (:hash row)]
+          [:td (get counts (:hash row))]
+          [:td (:path row)]])]])))
 
 (defroutes handler
   (GET "/" [] (library-files-html))
