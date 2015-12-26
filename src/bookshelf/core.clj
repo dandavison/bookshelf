@@ -7,8 +7,15 @@
   (:use [compojure.core :refer :all])
   (:use [compojure.route :as route]))
 
+(def library-dir "/Users/dan/GoogleDrive/Literature")
+
+(defn is-book [file]
+  (let [path (.getPath file)]
+    (or (.endsWith path ".pdf")
+        (.endsWith path ".epub"))))
+
 (defn library-files []
-  (file-seq (clojure.java.io/file "/Users/dan/GoogleDrive/Literature/iPad")))
+  (filter #'is-book (file-seq (clojure.java.io/file library-dir))))
 
 (defroutes handler
   (GET "/" [] (str/join "<br>" (library-files)))
