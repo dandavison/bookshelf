@@ -8,7 +8,8 @@
   (:use [compojure.route :as route])
   (:use [hiccup.page :as hiccup])
   (:use [clojure.java.jdbc :as sql])
-  (:use [pandect.algo.md5 :as md5]))
+  (:use [pandect.algo.md5 :as md5])
+  (:use [clojure.contrib.humanize :as humanize]))
 
 (def library-dir "/Users/dan/GoogleDrive/Literature")
 
@@ -61,7 +62,7 @@
      (for [row (sql/query db "SELECT * FROM books")]
        [:tr
         [:td (:name row)]
-        [:td (:size row)]
+        [:td (humanize/filesize (:size row))]
         [:td (:hash row)]
         [:td (:path row)]])]]))
 
