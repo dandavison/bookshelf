@@ -10,6 +10,7 @@
                  [hiccup "1.0.5"]
                  [org.clojure/java.jdbc "0.4.2"]
                  [org.xerial/sqlite-jdbc "3.8.11.2"]
+                 [pandect "0.5.4"]
                  [ring/ring-devel "1.4.0"]]
   ;; :dev-dependencies [[ring/ring-devel "1.4.0"]]
   :main ^:skip-aot bookshelf.core

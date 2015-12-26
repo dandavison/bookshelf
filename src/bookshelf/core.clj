@@ -7,7 +7,8 @@
   (:use [compojure.core :refer :all])
   (:use [compojure.route :as route])
   (:use [hiccup.page :as hiccup])
-  (:use [clojure.java.jdbc :as sql]))
+  (:use [clojure.java.jdbc :as sql])
+  (:use [pandect.algo.md5 :as md5]))
 
 (def library-dir "/Users/dan/GoogleDrive/Literature")
 
@@ -27,20 +28,20 @@
   (filter #'is-book (file-seq (clojure.java.io/file library-dir))))
 
 (defn create-db []
-  (try (sql/db-do-commands
-        db
-        (sql/create-table-ddl :books
-                          [:name :text]
-                          [:path :text]
-                          [:hash :text]))
-       (catch Exception e (println e))))
+  (sql/db-do-commands
+   db
+   (sql/drop-table-ddl :books)
+   (sql/create-table-ddl :books
+                         [:name :text]
+                         [:path :text]
+                         [:hash :text])))
 
 (defn populate-db []
   (for [file (library-files)]
     (sql/insert! db :books
                  {:name "name"
                   :path (.getPath file)
-                  :hash "hash"})))
+                  :hash (md5/md5-file file)})))
 
 (defn library-files-html []
   (hiccup/html5
@@ -49,10 +50,15 @@
     (hiccup/include-css "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")]
    [:table.table.table-hover.table-bordered
     [:thead
-     [:tr [:td "Path"]]]
+     [:tr
+      [:td "Name"]
+      [:td "Hash"]
+      [:td "Path"]]]
     [:tbody
      (for [row (sql/query db "SELECT * FROM books")]
        [:tr
+        [:td (:name row)]
+        [:td (:hash row)]
         [:td (:path row)]])]]))
 
 (defroutes handler
