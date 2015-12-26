@@ -18,8 +18,10 @@
 
 (defn is-book [file]
   (let [path (.getPath file)]
-    (or (.endsWith path ".pdf")
-        (.endsWith path ".epub"))))
+    (and
+     (.isFile file)
+     (or (.endsWith path ".pdf")
+         (.endsWith path ".epub")))))
 
 (defn library-files []
   (filter #'is-book (file-seq (clojure.java.io/file library-dir))))
