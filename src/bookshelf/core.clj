@@ -6,7 +6,7 @@
   (:use [ring.middleware.stacktrace :as stacktrace])
   (:use [compojure.core :refer :all])
   (:use [compojure.route :as route])
-  (:use [hiccup.core :as hiccup]))
+  (:use [hiccup.page :as hiccup]))
 
 (def library-dir "/Users/dan/GoogleDrive/Literature")
 
@@ -19,10 +19,17 @@
   (filter #'is-book (file-seq (clojure.java.io/file library-dir))))
 
 (defn library-files-html []
-  (hiccup/html
-   [:ul
-    (for [file (library-files)]
-      [:li (.getPath file)])]))
+  (hiccup/html5
+   [:head
+    [:title "bookshelf"]
+    (hiccup/include-css "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")]
+   [:table.table.table-hover.table-bordered
+    [:thead
+     [:tr [:td "Path"]]]
+    [:tbody
+     (for [file (library-files)]
+       [:tr
+        [:td (.getPath file)]])]]))
 
 (defroutes handler
   (GET "/" [] (library-files-html))
