@@ -11,7 +11,7 @@
                  [org.clojure/java.jdbc "0.4.2"]
                  [org.xerial/sqlite-jdbc "3.8.11.2"]
                  [pandect "0.5.4"]
-                 [clojure-humanize "0.1.0"]
+                 [bilus/clojure-humanize "0.1.0"]
                  [ring/ring-devel "1.4.0"]]
   ;; :dev-dependencies [[ring/ring-devel "1.4.0"]]
   :main ^:skip-aot bookshelf.core
