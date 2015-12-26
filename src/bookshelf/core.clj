@@ -6,9 +6,15 @@
   (:use [ring.middleware.stacktrace :as stacktrace])
   (:use [compojure.core :refer :all])
   (:use [compojure.route :as route])
-  (:use [hiccup.page :as hiccup]))
+  (:use [hiccup.page :as hiccup])
+  (:use [clojure.java.jdbc :as sql]))
 
 (def library-dir "/Users/dan/GoogleDrive/Literature")
+
+(def db
+  {:classname   "org.sqlite.JDBC"
+   :subprotocol "sqlite"
+   :subname     "db/database.db"})
 
 (defn is-book [file]
   (let [path (.getPath file)]
@@ -17,6 +23,22 @@
 
 (defn library-files []
   (filter #'is-book (file-seq (clojure.java.io/file library-dir))))
+
+(defn create-db []
+  (try (sql/db-do-commands
+        db
+        (sql/create-table-ddl :books
+                          [:name :text]
+                          [:path :text]
+                          [:hash :text]))
+       (catch Exception e (println e))))
+
+(defn populate-db []
+  (for [file (library-files)]
+    (sql/insert! db :books
+                 {:name "name"
+                  :path (.getPath file)
+                  :hash "hash"})))
 
 (defn library-files-html []
   (hiccup/html5
@@ -27,9 +49,9 @@
     [:thead
      [:tr [:td "Path"]]]
     [:tbody
-     (for [file (library-files)]
+     (for [row (sql/query db "SELECT * FROM books")]
        [:tr
-        [:td (.getPath file)]])]]))
+        [:td (:path row)]])]]))
 
 (defroutes handler
   (GET "/" [] (library-files-html))
