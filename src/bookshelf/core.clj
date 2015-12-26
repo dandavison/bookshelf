@@ -5,7 +5,8 @@
   (:use [ring.middleware.reload :as reload])
   (:use [ring.middleware.stacktrace :as stacktrace])
   (:use [compojure.core :refer :all])
-  (:use [compojure.route :as route]))
+  (:use [compojure.route :as route])
+  (:use [hiccup.core :as hiccup]))
 
 (def library-dir "/Users/dan/GoogleDrive/Literature")
 
@@ -17,8 +18,14 @@
 (defn library-files []
   (filter #'is-book (file-seq (clojure.java.io/file library-dir))))
 
+(defn library-files-html []
+  (hiccup/html
+   [:ul
+    (for [file (library-files)]
+      [:li (.getPath file)])]))
+
 (defroutes handler
-  (GET "/" [] (str/join "<br>" (library-files)))
+  (GET "/" [] (library-files-html))
   (route/not-found "Invalid request"))
 
 (def app

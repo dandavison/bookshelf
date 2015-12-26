@@ -7,6 +7,7 @@
                  [ring/ring-core "1.4.0"]
                  [ring/ring-jetty-adapter "1.4.0"]
                  [compojure "1.4.0"]
+                 [hiccup "1.0.5"]
                  [ring/ring-devel "1.4.0"]]
   ;; :dev-dependencies [[ring/ring-devel "1.4.0"]]
   :main ^:skip-aot bookshelf.core
