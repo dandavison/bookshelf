@@ -2,8 +2,10 @@
   (:gen-class)
   (:use [clojure.string :as str])
   (:use [ring.adapter.jetty :as jetty])
+  (:use [ring.middleware.json :as json])
   (:use [ring.middleware.reload :as reload])
   (:use [ring.middleware.stacktrace :as stacktrace])
+  (:use [ring.util.response :refer [response resource-response]])
   (:use [compojure.core :as compojure])
   (:use [compojure.route :as route])
   (:use [hiccup.page :as hiccup])
@@ -70,12 +72,23 @@
           [:td (humanize/filesize (:size row))]
           [:td (make-notes row counts)]])]])))
 
+(defn library-files-data []
+  (for [row (sql/query db "SELECT * FROM books ORDER BY name")]
+    {:name (:name row)
+     :hash (:hash row)
+     :size (:size row)
+     :path (:path row)}))
+
 (defroutes handler
-  (compojure/GET "/hiccup" [] (library-files-html))
-  (route/not-found "Invalid request"))
+  (GET "/hiccup/" [] (library-files-html))
+  (GET "/json/" [] (response (library-files-data)))
+  (GET "/" [] (resource-response "index.html" {:root "public"}))
+  (not-found "Invalid request"))
 
 (def app
   (-> #'handler
+      (json/wrap-json-body)
+      (json/wrap-json-response)
       (reload/wrap-reload '(bookshelf.core))
       (stacktrace/wrap-stacktrace)))
 
