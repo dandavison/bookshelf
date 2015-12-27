@@ -46,6 +46,10 @@
                   :size (.length file)
                   :path (.getPath file)})))
 
+(defn make-notes [row counts]
+  (let [count (get counts (:hash row))]
+    (if (> count 1) (format "%d copies" count))))
+
 (defn library-files-html []
   (let [rows (sql/query db "SELECT * FROM books ORDER BY name")
         counts (frequencies (map :hash rows))]
@@ -58,17 +62,13 @@
        [:tr
         [:td "Name"]
         [:td "Size"]
-        [:td "Hash"]
-        [:td "Notes"]
-        [:td "Path"]]]
+        [:td "Notes"]]]
       [:tbody
        (for [row rows]
          [:tr
           [:td (:name row)]
           [:td (humanize/filesize (:size row))]
-          [:td (:hash row)]
-          [:td (get counts (:hash row))]
-          [:td (:path row)]])]])))
+          [:td (make-notes row counts)]])]])))
 
 (defroutes handler
   (GET "/" [] (library-files-html))
