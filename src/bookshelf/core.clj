@@ -4,7 +4,7 @@
   (:use [ring.adapter.jetty :as jetty])
   (:use [ring.middleware.reload :as reload])
   (:use [ring.middleware.stacktrace :as stacktrace])
-  (:use [compojure.core :refer :all])
+  (:use [compojure.core :as compojure])
   (:use [compojure.route :as route])
   (:use [hiccup.page :as hiccup])
   (:use [clojure.java.jdbc :as sql])
@@ -71,7 +71,7 @@
           [:td (make-notes row counts)]])]])))
 
 (defroutes handler
-  (GET "/" [] (library-files-html))
+  (compojure/GET "/" [] (library-files-html))
   (route/not-found "Invalid request"))
 
 (def app
