@@ -71,7 +71,7 @@
           [:td (make-notes row counts)]])]])))
 
 (defroutes handler
-  (compojure/GET "/" [] (library-files-html))
+  (compojure/GET "/hiccup" [] (library-files-html))
   (route/not-found "Invalid request"))
 
 (def app
