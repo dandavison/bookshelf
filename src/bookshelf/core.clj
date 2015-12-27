@@ -41,13 +41,13 @@
 (defn populate-db []
   (for [file (library-files)]
     (sql/insert! db :books
-                 {:name "name"
+                 {:name (.getName file)
                   :hash (md5/md5-file file)
                   :size (.length file)
                   :path (.getPath file)})))
 
 (defn library-files-html []
-  (let [rows (sql/query db "SELECT * FROM books")
+  (let [rows (sql/query db "SELECT * FROM books ORDER BY name")
         counts (frequencies (map :hash rows))]
     (hiccup/html5
      [:head
