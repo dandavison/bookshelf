@@ -4,6 +4,7 @@
   (:use [ring.adapter.jetty :as jetty])
   (:use [ring.middleware.json :as json])
   (:use [ring.middleware.reload :as reload])
+  (:use [ring.middleware.resource])
   (:use [ring.middleware.stacktrace :as stacktrace])
   (:use [ring.util.response :refer [response resource-response]])
   (:use [compojure.core :as compojure])
@@ -87,6 +88,7 @@
 
 (def app
   (-> #'handler
+      (wrap-resource "public")
       (json/wrap-json-body)
       (json/wrap-json-response)
       (reload/wrap-reload '(bookshelf.core))
