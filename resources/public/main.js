@@ -16,7 +16,7 @@ var Table = React.createClass({
       rows.push(<TableRow key={row.hash} row={row} />)
     })
     return (
-      <table>
+      <table className="table table-hover table-bordered">
         <thead>
           <tr>
             <td>Name</td>
